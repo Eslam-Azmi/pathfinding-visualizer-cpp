@@ -8,7 +8,10 @@ using namespace std;
 
 struct compareCells {
     bool operator()(const Cell* a, const Cell* b){
-        return a->distance > b->distance;
+        if (a->fCost == b->fCost){
+            return a->gCost < b->gCost;
+        }
+        return a->fCost > b->fCost;
     }
 };
 
@@ -21,7 +24,7 @@ class Pathfinding{
         pair<int,int> startPos_;
         pair<int,int> endPos_;
 
-        Cell* path = nullptr;
+        Cell* pather = nullptr;
 
     public:
         Pathfinding();

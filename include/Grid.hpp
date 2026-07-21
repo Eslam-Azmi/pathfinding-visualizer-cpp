@@ -25,7 +25,7 @@ class Grid{
         void hardReset(pair<int,int>& lastStart, pair<int,int>& lastEnd);
         void softClear(pair<int,int>& lastStart, pair<int,int>& lastEnd);
         void handlePainting(sf::RenderWindow& window,  bool starting, bool ending, bool walling,
-                            pair<int,int>& lastStart, pair<int,int>& lastEnd);
+                            bool mudding, pair<int,int>& lastStart, pair<int,int>& lastEnd);
 };
 
 #endif

@@ -36,6 +36,8 @@ void Grid::draw(sf::RenderWindow& window){
                     cellShape_.setFillColor(sf::Color(0, 100, 150)); break;
                 case cellState::path:
                     cellShape_.setFillColor(sf::Color::Yellow); break;
+                case cellState::mud:
+                    cellShape_.setFillColor(sf::Color(165, 42, 42)); break;
             }
 
             window.draw(cellShape_);
@@ -47,7 +49,8 @@ void Grid::hardReset(pair<int,int>& lastStart, pair<int,int>& lastEnd){
     for (int r = 0; r < gridSize_; r++){
         for (int c = 0; c < gridSize_; c++){
             cells_[r][c].state = cellState::empty;
-            cells_[r][c].distance = 1e9;
+            cells_[r][c].gCost = 1e9;
+            cells_[r][c].fCost = 1e9;
             cells_[r][c].parent = nullptr;
         }
     }
@@ -58,7 +61,8 @@ void Grid::hardReset(pair<int,int>& lastStart, pair<int,int>& lastEnd){
 void Grid::softClear(pair<int,int>& lastStart, pair<int,int>& lastEnd){
     for (int r = 0; r < gridSize_; r++){
         for (int c = 0; c < gridSize_; c++){
-            cells_[r][c].distance = 1e9;
+            cells_[r][c].gCost = 1e9;
+            cells_[r][c].fCost = 1e9;
             cells_[r][c].parent = nullptr;
 
             if (cells_[r][c].state == cellState::visited || cells_[r][c].state == cellState::path){
@@ -68,7 +72,7 @@ void Grid::softClear(pair<int,int>& lastStart, pair<int,int>& lastEnd){
     }
 }
 
-void Grid::handlePainting(sf::RenderWindow& window, bool starting, bool ending, bool walling, pair<int,int>& lastStart, pair<int,int>& lastEnd){
+void Grid::handlePainting(sf::RenderWindow& window, bool starting, bool ending, bool walling, bool mudding, pair<int,int>& lastStart, pair<int,int>& lastEnd){
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
     int r = mousePos.y / cellSize_;
@@ -95,8 +99,12 @@ void Grid::handlePainting(sf::RenderWindow& window, bool starting, bool ending, 
             if (targetCell.state == cellState::empty) {
                 targetCell.state = cellState::wall;
             }
+        }else if (mudding){
+            if (targetCell.state == cellState::empty) {
+                targetCell.state = cellState::mud;
+            }
         }else {
-            if (targetCell.state == cellState::wall) {
+            if (targetCell.state == cellState::wall || targetCell.state == cellState::mud){
                 targetCell.state = cellState::empty;
             }
         }

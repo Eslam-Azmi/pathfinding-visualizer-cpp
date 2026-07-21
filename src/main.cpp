@@ -13,7 +13,7 @@ int main(){
 
 
     sf::RenderWindow window(sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "A* & Dijkstra Pathfinding Visualizer");
-    window.setFramerateLimit(30);
+    window.setFramerateLimit(60);
 
     Grid grid(20,40.0f);
     Pathfinding pathfinder;
@@ -51,15 +51,17 @@ int main(){
         if (!pathfinder.isRunning()){
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)){
-                    grid.handlePainting(window, true, false, false, lastStart, lastEnd);
+                    grid.handlePainting(window, true, false, false, false, lastStart, lastEnd);
                 }else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E)){
-                    grid.handlePainting(window, false, true, false, lastStart, lastEnd);
-                }else{
-                    grid.handlePainting(window, false, false, true, lastStart, lastEnd);
+                    grid.handlePainting(window, false, true, false, false, lastStart, lastEnd);
+                }else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::M)){
+                    grid.handlePainting(window, false, false, false, true, lastStart, lastEnd);
+                }else {
+                    grid.handlePainting(window, false, false, true, false, lastStart, lastEnd);
                 }
             }
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)){
-                grid.handlePainting(window, false, false, false, lastStart, lastEnd);
+                grid.handlePainting(window, false, false, false, false, lastStart, lastEnd);
             }
         }
 

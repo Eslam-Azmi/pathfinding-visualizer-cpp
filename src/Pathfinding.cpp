@@ -1,4 +1,5 @@
 #include "../include/Pathfinding.hpp"
+#include <cmath>
 
 Pathfinding::Pathfinding()
     : running_(false), pathFound_(false), startPos_({-1,-1}), endPos_({-1,-1}){
@@ -17,7 +18,8 @@ void Pathfinding::startSearch(Grid& grid, pair<int,int> startPos, pair<int,int> 
     for (int r = 0; r < size; r++){
         for (int c = 0; c < size; c++){
             Cell& cell = grid.getCell(r, c);
-            cell.distance = 1e9;
+            cell.gCost = 1e9;
+            cell.fCost = 1e9;
             cell.parent = nullptr;
 
             if (cell.state == cellState::visited || cell.state == cellState::path){
@@ -27,7 +29,8 @@ void Pathfinding::startSearch(Grid& grid, pair<int,int> startPos, pair<int,int> 
     }
 
     Cell& startCell = grid.getCell(startPos_.first, startPos_.second);
-    startCell.distance = 0;
+    startCell.gCost = 0;
+    startCell.fCost = abs(startPos_.first-endPos_.first) + abs(startPos_.second-endPos_.second);
 
     pq_.push(&startCell);
 }
@@ -45,7 +48,7 @@ void Pathfinding::step(Grid& grid){
 
     if (current->row == endPos_.first && current->col == endPos_.second){
         pathFound_ = true;
-        path = current->parent;
+        pather = current->parent;
         
         return;
     }
@@ -67,10 +70,20 @@ void Pathfinding::step(Grid& grid){
 
             if (neighbor.state == cellState::wall) continue;
 
-            int newDistance = current->distance + 1;
+            int weight = 1;
+            switch(neighbor.state){
+                case cellState::mud: 
+                    weight = 5; break;
+                case cellState::empty: 
+                    weight = 1; break;
+            }
 
-            if (newDistance < neighbor.distance){
-                neighbor.distance = newDistance;
+            int newGCost = current->gCost + weight;
+            int newFCost = newGCost + abs(nr-endPos_.first) + abs(nc-endPos_.second);
+
+            if (newFCost < neighbor.fCost){
+                neighbor.gCost = newGCost;
+                neighbor.fCost = newFCost;
                 neighbor.parent = current;
                 pq_.push(&neighbor);
             }
@@ -79,13 +92,13 @@ void Pathfinding::step(Grid& grid){
 }
 
 void Pathfinding::pathing(Grid& grid){
-    if (path->row == startPos_.first && path->col == startPos_.second){
+    if (pather->row == startPos_.first && pather->col == startPos_.second){
             pathFound_ = false;
             running_ = false;
             return;
         }
-        path->state = cellState::path;
-        path = path->parent;
+        pather->state = cellState::path;
+        pather = pather->parent;
 }
 
 void Pathfinding::reset(){

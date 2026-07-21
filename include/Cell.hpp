@@ -7,7 +7,8 @@ enum class cellState {
     start,
     end,
     visited,
-    path
+    path,
+    mud
 };
 
 struct Cell {
@@ -15,7 +16,8 @@ struct Cell {
     int col;
     cellState state = cellState::empty;
 
-    int distance = 0;
+    int gCost = 1e9;  //ground cost
+    int fCost = 1e9;  // full esitmated cost
     Cell* parent = nullptr;
 };
 
